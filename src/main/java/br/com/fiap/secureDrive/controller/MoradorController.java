@@ -1,10 +1,10 @@
 package br.com.fiap.secureDrive.controller;
 
+import br.com.fiap.secureDrive.dto.MoradorDTO;
 import br.com.fiap.secureDrive.exception.ResourceNotFoundException;
-import br.com.fiap.secureDrive.model.Morador;
 import br.com.fiap.secureDrive.service.MoradorService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,36 +14,34 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/moradores")
-@Validated
 public class MoradorController {
-
     @Autowired
     private MoradorService moradorService;
 
     @GetMapping
-    public List<Morador> getAllMoradores() {
+    public List<MoradorDTO> getAllMoradores() {
         return moradorService.getAllMoradores();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Morador> getMoradorById(@PathVariable Long id) {
-        Optional<Morador> morador = moradorService.getMoradorById(id);
-        return morador.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<MoradorDTO> getMoradorById(@PathVariable Long id) {
+        Optional<MoradorDTO> moradorDTO = moradorService.getMoradorById(id);
+        return moradorDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public Morador createMorador(@Valid @RequestBody Morador morador) {
-        return moradorService.createMorador(morador);
+    public ResponseEntity<MoradorDTO> createMorador(@Validated @RequestBody MoradorDTO moradorDTO) {
+        MoradorDTO createdMorador = moradorService.createMorador(moradorDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdMorador);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Morador> updateMorador(@PathVariable Long id, @RequestBody Morador moradorDetails) {
+    public ResponseEntity<MoradorDTO> updateMorador(@PathVariable Long id, @Validated @RequestBody MoradorDTO moradorDetails) {
         try {
-            Morador updatedMorador = moradorService.updateMorador(id, moradorDetails);
+            MoradorDTO updatedMorador = moradorService.updateMorador(id, moradorDetails);
             return ResponseEntity.ok(updatedMorador);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
@@ -52,8 +50,8 @@ public class MoradorController {
         try {
             moradorService.deleteMorador(id);
             return ResponseEntity.noContent().build();
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

@@ -1,5 +1,7 @@
 package br.com.fiap.secureDrive.service.Impl;
+import br.com.fiap.secureDrive.dto.HorarioRestricaoDTO;
 import br.com.fiap.secureDrive.exception.ResourceNotFoundException;
+import br.com.fiap.secureDrive.mapper.HorarioRestricaoMapper;
 import br.com.fiap.secureDrive.model.HorarioRestricao;
 import br.com.fiap.secureDrive.repository.HorarioRestricaoRepository;
 import br.com.fiap.secureDrive.service.HorarioRestricaoService;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HorarioRestricaoServiceImpl implements HorarioRestricaoService {
@@ -16,31 +19,34 @@ public class HorarioRestricaoServiceImpl implements HorarioRestricaoService {
     private HorarioRestricaoRepository horarioRestricaoRepository;
 
     @Override
-    public List<HorarioRestricao> getAllHorariosRestricao() {
-        return horarioRestricaoRepository.findAll();
+    public List<HorarioRestricaoDTO> getAllHorariosRestricao() {
+        return horarioRestricaoRepository.findAll().stream()
+                .map(HorarioRestricaoMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<HorarioRestricao> getHorarioRestricaoById(Long id) {
-        return horarioRestricaoRepository.findById(id);
+    public Optional<HorarioRestricaoDTO> getHorarioRestricaoById(Long id) {
+        return horarioRestricaoRepository.findById(id)
+                .map(HorarioRestricaoMapper.INSTANCE::toDto);
     }
 
     @Override
-    public HorarioRestricao createHorarioRestricao(HorarioRestricao horarioRestricao) {
-        return horarioRestricaoRepository.save(horarioRestricao);
+    public HorarioRestricaoDTO createHorarioRestricao(HorarioRestricaoDTO horarioRestricaoDTO) {
+        HorarioRestricao horarioRestricao = HorarioRestricaoMapper.INSTANCE.toEntity(horarioRestricaoDTO);
+        return HorarioRestricaoMapper.INSTANCE.toDto(horarioRestricaoRepository.save(horarioRestricao));
     }
 
     @Override
-    public HorarioRestricao updateHorarioRestricao(Long id, HorarioRestricao horarioRestricaoDetails) {
+    public HorarioRestricaoDTO updateHorarioRestricao(Long id, HorarioRestricaoDTO horarioRestricaoDetails) {
         Optional<HorarioRestricao> horarioRestricao = horarioRestricaoRepository.findById(id);
         if (horarioRestricao.isPresent()) {
             HorarioRestricao horarioRestricaoToUpdate = horarioRestricao.get();
             horarioRestricaoToUpdate.setInicio(horarioRestricaoDetails.getInicio());
             horarioRestricaoToUpdate.setFim(horarioRestricaoDetails.getFim());
-            horarioRestricaoToUpdate.setTipoVeiculo(horarioRestricaoDetails.getTipoVeiculo());
-            return horarioRestricaoRepository.save(horarioRestricaoToUpdate);
+            return HorarioRestricaoMapper.INSTANCE.toDto(horarioRestricaoRepository.save(horarioRestricaoToUpdate));
         } else {
-            throw new ResourceNotFoundException("HorarioRestricao não encontrado com o ID fornecido. - " + id);
+            throw new ResourceNotFoundException("Horário de Restrição não encontrado com o ID fornecido - " + id);
         }
     }
 
@@ -49,7 +55,7 @@ public class HorarioRestricaoServiceImpl implements HorarioRestricaoService {
         if (horarioRestricaoRepository.existsById(id)) {
             horarioRestricaoRepository.deleteById(id);
         } else {
-            throw new ResourceNotFoundException("HorarioRestricao não encontrado com o ID fornecido. -" + id);
+            throw new ResourceNotFoundException("Horário de Restrição não encontrado com o ID fornecido - " + id);
         }
     }
 

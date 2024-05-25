@@ -1,12 +1,14 @@
 package br.com.fiap.secureDrive.service;
-import br.com.fiap.secureDrive.model.Morador;
+
+import br.com.fiap.secureDrive.dto.MoradorDTO;
 
 import java.util.List;
 import java.util.Optional;
+
 public interface MoradorService {
-    List<Morador> getAllMoradores();
-    Optional<Morador> getMoradorById(Long id);
-    Morador createMorador(Morador morador);
-    Morador updateMorador(Long id, Morador moradorDetails);
+    List<MoradorDTO> getAllMoradores();
+    Optional<MoradorDTO> getMoradorById(Long id);
+    MoradorDTO createMorador(MoradorDTO moradorDTO);
+    MoradorDTO updateMorador(Long id, MoradorDTO moradorDetails);
     void deleteMorador(Long id);
 }

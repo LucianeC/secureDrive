@@ -35,21 +35,18 @@ public class Morador {
     @Email(message = "Email deve ser válido")
     private String email;
 
-    @NotEmpty(message = "Senha é obrigatória")
-    @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
-    private String senha;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Morador morador = (Morador) o;
-        return Objects.equals(id, morador.id) && Objects.equals(nome, morador.nome) && Objects.equals(email, morador.email) && Objects.equals(senha, morador.senha);
+        return Objects.equals(id, morador.id) && Objects.equals(nome, morador.nome) && Objects.equals(email, morador.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nome, email, senha);
+        return Objects.hash(id, nome, email);
     }
 
     public Long getId() {
@@ -74,14 +71,6 @@ public class Morador {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 
 

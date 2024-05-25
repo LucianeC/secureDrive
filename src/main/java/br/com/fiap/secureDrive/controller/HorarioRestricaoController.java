@@ -1,10 +1,10 @@
 package br.com.fiap.secureDrive.controller;
 
+import br.com.fiap.secureDrive.dto.HorarioRestricaoDTO;
 import br.com.fiap.secureDrive.exception.ResourceNotFoundException;
-import br.com.fiap.secureDrive.model.HorarioRestricao;
 import br.com.fiap.secureDrive.service.HorarioRestricaoService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,36 +14,34 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/horarios-restricao")
-@Validated
 public class HorarioRestricaoController {
-
     @Autowired
     private HorarioRestricaoService horarioRestricaoService;
 
     @GetMapping
-    public List<HorarioRestricao> getAllHorariosRestricao() {
+    public List<HorarioRestricaoDTO> getAllHorariosRestricao() {
         return horarioRestricaoService.getAllHorariosRestricao();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HorarioRestricao> getHorarioRestricaoById(@PathVariable Long id) {
-        Optional<HorarioRestricao> horarioRestricao = horarioRestricaoService.getHorarioRestricaoById(id);
-        return horarioRestricao.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<HorarioRestricaoDTO> getHorarioRestricaoById(@PathVariable Long id) {
+        Optional<HorarioRestricaoDTO> horarioRestricaoDTO = horarioRestricaoService.getHorarioRestricaoById(id);
+        return horarioRestricaoDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public HorarioRestricao createHorarioRestricao(@Valid @RequestBody HorarioRestricao horarioRestricao) {
-        return horarioRestricaoService.createHorarioRestricao(horarioRestricao);
+    public ResponseEntity<HorarioRestricaoDTO> createHorarioRestricao(@Validated @RequestBody HorarioRestricaoDTO horarioRestricaoDTO) {
+        HorarioRestricaoDTO createdHorarioRestricao = horarioRestricaoService.createHorarioRestricao(horarioRestricaoDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdHorarioRestricao);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HorarioRestricao> updateHorarioRestricao(@PathVariable Long id, @RequestBody HorarioRestricao horarioRestricaoDetails) {
+    public ResponseEntity<HorarioRestricaoDTO> updateHorarioRestricao(@PathVariable Long id, @Validated @RequestBody HorarioRestricaoDTO horarioRestricaoDetails) {
         try {
-            HorarioRestricao updatedHorarioRestricao = horarioRestricaoService.updateHorarioRestricao(id, horarioRestricaoDetails);
+            HorarioRestricaoDTO updatedHorarioRestricao = horarioRestricaoService.updateHorarioRestricao(id, horarioRestricaoDetails);
             return ResponseEntity.ok(updatedHorarioRestricao);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
@@ -52,8 +50,8 @@ public class HorarioRestricaoController {
         try {
             horarioRestricaoService.deleteHorarioRestricao(id);
             return ResponseEntity.noContent().build();
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

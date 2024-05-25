@@ -1,14 +1,15 @@
 package br.com.fiap.secureDrive.service;
 
-import br.com.fiap.secureDrive.model.Administrador;
+import br.com.fiap.secureDrive.dto.AdministradorDTO;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface AdministradorService {
-    List<Administrador> getAllAdministradores();
-    Optional<Administrador> getAdministradorById(Long id);
-    Administrador createAdministrador(Administrador administrador);
-    Administrador updateAdministrador(Long id, Administrador administradorDetails);
+    List<AdministradorDTO> getAllAdministradores();
+    Optional<AdministradorDTO> getAdministradorById(Long id);
+    AdministradorDTO createAdministrador(@Valid AdministradorDTO administrador);
+    AdministradorDTO updateAdministrador(Long id, @Valid AdministradorDTO administradorDetails);
     void deleteAdministrador(Long id);
 }

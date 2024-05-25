@@ -76,4 +76,6 @@ public class HorarioRestricao {
     public int hashCode() {
         return Objects.hash(id, inicio, fim, tipoVeiculo);
     }
+
+
 }

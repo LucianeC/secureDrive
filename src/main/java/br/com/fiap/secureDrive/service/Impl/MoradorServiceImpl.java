@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import br.com.fiap.secureDrive.service.MoradorService;
+import br.com.fiap.secureDrive.dto.MoradorDTO;
+import br.com.fiap.secureDrive.mapper.MoradorMapper;
+import java.util.stream.Collectors;
+
 
 @Service
 public class MoradorServiceImpl implements MoradorService {
@@ -15,31 +19,34 @@ public class MoradorServiceImpl implements MoradorService {
     private MoradorRepository moradorRepository;
 
     @Override
-    public List<Morador> getAllMoradores() {
-        return moradorRepository.findAll();
+    public List<MoradorDTO> getAllMoradores() {
+        return moradorRepository.findAll().stream()
+                .map(MoradorMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Morador> getMoradorById(Long id) {
-        return moradorRepository.findById(id);
+    public Optional<MoradorDTO> getMoradorById(Long id) {
+        return moradorRepository.findById(id)
+                .map(MoradorMapper.INSTANCE::toDto);
     }
 
     @Override
-    public Morador createMorador(Morador morador) {
-        return moradorRepository.save(morador);
+    public MoradorDTO createMorador(MoradorDTO moradorDTO) {
+        Morador morador = MoradorMapper.INSTANCE.toEntity(moradorDTO);
+        return MoradorMapper.INSTANCE.toDto(moradorRepository.save(morador));
     }
 
     @Override
-    public Morador updateMorador(Long id, Morador moradorDetails) {
+    public MoradorDTO updateMorador(Long id, MoradorDTO moradorDetails) {
         Optional<Morador> morador = moradorRepository.findById(id);
         if (morador.isPresent()) {
             Morador moradorToUpdate = morador.get();
             moradorToUpdate.setNome(moradorDetails.getNome());
             moradorToUpdate.setEmail(moradorDetails.getEmail());
-            moradorToUpdate.setSenha(moradorDetails.getSenha());
-            return moradorRepository.save(moradorToUpdate);
+            return MoradorMapper.INSTANCE.toDto(moradorRepository.save(moradorToUpdate));
         } else {
-            throw new ResourceNotFoundException("Morador não encontrado com o ID fornecido. -" + id);
+            throw new ResourceNotFoundException("Morador não encontrado com o ID fornecido - " + id);
         }
     }
 
@@ -48,7 +55,7 @@ public class MoradorServiceImpl implements MoradorService {
         if (moradorRepository.existsById(id)) {
             moradorRepository.deleteById(id);
         } else {
-            throw new ResourceNotFoundException(" Morador não encontrado com o ID fornecido. -" + id);
+            throw new ResourceNotFoundException("Morador não encontrado com o ID fornecido - " + id);
         }
     }
 }
