@@ -3,14 +3,14 @@
 Secure Drive é uma aplicação Spring Boot para gerenciar moradores, veículos e horários de restrição em um condomínio.
 
 ## Sumário
-
-- [Visão Geral](#visão-geral)
-- [Funcionalidades](#funcionalidades)
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [Execução](#execução)
-- [Contribuição](#contribuição)
-
+1. [Visão Geral](#visão-geral)
+2. [Funcionalidades](#funcionalidades)
+3. [Pré-requisitos](#pré-requisitos)
+4. [Instalação](#instalação)
+5. [Execução](#execução)
+6. [API Endpoints](#api-endpoints)
+7. [Contribuição](#contribuição)
+8. [Docker](#docker)
 
 ## Visão Geral
 
@@ -69,4 +69,38 @@ Esta aplicação foi desenvolvida para gerenciar informações sobre moradores, 
 - `PUT /api/horarios-restricao/{id}`: Atualiza um horário de restrição pelo ID
 - `DELETE /api/horarios-restricao/{id}`: Deleta um horário de restrição pelo ID
 
+  ## Docker
+  Para construir a imagem Docker da aplicação, execute o seguinte comando no diretório raiz do projeto:
+  
+   ```bash
+      docker build -t secure-drive .
+    ```
+  Após a construção da imagem, você pode executar o contêiner com o seguinte comando:
+     ```bash
+      docker run -p 8080:8080 secure-drive
+    ```
+
+     ```bash
+        version: '3.8'
+     services:
+      secure_drive:
+        build:
+          context: .
+          dockerfile: Dockerfile
+     ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//db_host:1521/db_name
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pass
+    depends_on:
+      - db
+     db:
+        image: oracle/database:19.3.0-se2
+        environment:
+          - ORACLE_PWD=YourPassword123
+    ports:
+      - "1521:1521"
+
+    ```
 
